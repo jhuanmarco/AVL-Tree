@@ -57,23 +57,24 @@ NODE *createNode(int info){
 	return newNode;
 }
 
-void RSE(NODE **p){	
-	NODE *q, *temp;
-	q = (*p)->right;
-	temp = q->left;
-	q->left = (*p);
-	(*p)->right = temp;
-	(*p)= q;
-
+void RSE(NODE **p){ 	
+	NODE *no;
+	no = (*p)->right;
+	(*p)->right = no->left;
+	no->left = (*p);
+	attAltura(*p);
+	attAltura(no);
+	(*p) = no;
 }
 
-void RSD(NODE **p){
-	NODE *q, *temp;
-	q = (*p)->left;
-	temp = q->right;
-	q->right = (*p);
-	(*p)->left = temp;
-	(*p) = q;
+void RSD(NODE **p){ 
+	NODE *no;
+	no = (*p)->left;
+	(*p)->left = no->right;
+	no->right = (*p);
+	attAltura(*p);
+	attAltura(no);
+	(*p) = no;
 }
 
 
@@ -101,25 +102,24 @@ void createNewNode(NODE **root, int *i, int info){
 	
 	if(*i == 0){
 		attAltura(*root);
+		printf(" \nInfo = %d Altura = %d\n", (*root)->info,(*root)->fb);
 		if((*root)->fb == -2){
 			if((*root)->right->fb < 0){ //RSE
-				RSE(*root);
-				attAltura(*root);
-				attAltura((*root)->left);
+				RSE(root);
 			
 			}else{ //RDE
-				
+				RSD(&((*root)->right));
+				RSE(root);
 			
 			}
 	
 		} else if((*root)->fb == 2){
-			if((*root)->left->fb < 0){ //RSD
-				RSD(*root);
-				attAltura(*root);
-				attAltura((*root)->right);
+			if((*root)->left->fb > 0){ //RSD
+				RSD(root);
 			
 			}else{ //RDD
-			
+				RSE(&((*root)->left));
+				RSD(root);
 			
 			}
 	
@@ -133,8 +133,6 @@ void addNode(NODE **root){
 	int info = returnInfo();
 	int i = 1;
 	createNewNode(root, &i, info);
-	
-
 }
 
 void postOrder(NODE *walk){
