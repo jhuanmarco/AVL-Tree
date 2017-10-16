@@ -168,9 +168,17 @@ void inOrder(NODE *walk){
 	return;
 }
 
+void destroy(NODE *root){
+	if(!root) return;
+	destroy(root->left);
+	destroy(root->right);
+	free(root);
+}
+
 void destroyAVL(NODE **root){
-	*root = NULL;
+	destroy(*root);
 	printf("AVL Successful Destroyed\n");
+	*root = NULL;
 	return;
 }
 
@@ -297,7 +305,7 @@ void main(){
 					break;
 				}	
 
-				deleteNode(&root);
+				deleteNode(&root); //DELETA IGUAL BST, NAO IMPLEMENTADO
 			break;
 			case '5':
 				if(!root){
