@@ -9,7 +9,7 @@ typedef struct node {
 } NODE;
 
 
-char mainMenu(){
+char mainMenu(){ //Menu principal
 	char option;
 	printf("\nAVL Tree\n\nType:\n1 - Create AVL\n2 - Add Node\n3 - Search Node\n4 - Del Node\n5 - Destroy AVL\n6 - Print AVL\n0 - Exit\n");
 	scanf(" %c", &option);
@@ -18,7 +18,7 @@ char mainMenu(){
 	return option;
 }
 
-int returnInfo(){
+int returnInfo(){ //Para coletar a info do Nó
 	int info;
 	printf("Type Node Info: ");
 	scanf(" %d", &info);
@@ -26,7 +26,7 @@ int returnInfo(){
 	return info; 
 }
 
-int altura (NODE *r) {
+int altura (NODE *r) { //Altura da arvore, usado para comparar e gerar o FB (fator balanceamento
    if (r == NULL) 
       return -1; 
    else {
@@ -37,11 +37,11 @@ int altura (NODE *r) {
    }
 }
 
-void attAltura(NODE *root){
+void attAltura(NODE *root){ //Atualiza o fb da arvore
 	root->fb = altura(root->left) - altura(root->right);
 }
 	
-NODE *createNode(int info){
+NODE *createNode(int info){ //Aloca espaço para o novo nó
 	NODE *newNode = malloc(sizeof(NODE));
 	if(!newNode){
 		 printf("Error: No Memory");
@@ -57,7 +57,7 @@ NODE *createNode(int info){
 	return newNode;
 }
 
-void RSE(NODE **p){ 	
+void RSE(NODE **p){ 	//Rotação simples a esquerda
 	NODE *no;
 	no = (*p)->right;
 	(*p)->right = no->left;
@@ -67,7 +67,7 @@ void RSE(NODE **p){
 	(*p) = no;
 }
 
-void RSD(NODE **p){ 
+void RSD(NODE **p){ 	//Rotação simples a direita
 	NODE *no;
 	no = (*p)->left;
 	(*p)->left = no->right;
@@ -79,7 +79,7 @@ void RSD(NODE **p){
 
 
 
-void createNewNode(NODE **root, int *i, int info){
+void createNewNode(NODE **root, int *i, int info){ //Adiciona um novo nó recursivamente e rearranja a arvore
 	if(*i == 1){
 		if(info >= (*root)->info){
 			if((*root)->right == NULL){
@@ -129,13 +129,13 @@ void createNewNode(NODE **root, int *i, int info){
 	}
 }
 
-void addNode(NODE **root){
+void addNode(NODE **root){ //chama funcao principal de adicao de nó
 	int info = returnInfo();
 	int i = 1;
 	createNewNode(root, &i, info);
 }
 
-void postOrder(NODE *walk){
+void postOrder(NODE *walk){ //caminhamentos abaixo
 	if(walk){
 		postOrder(walk->left);
 		postOrder(walk->right);
@@ -174,7 +174,7 @@ void destroyAVL(NODE **root){
 	return;
 }
 
-int searchMatchesNode(NODE *root, int i){
+int searchMatchesNode(NODE *root, int i){ //Procura nós
 	int matches = 0; 
 
 	if(!root) return 0;
@@ -206,14 +206,55 @@ void searchNode(NODE *root){
 	return;
 }
 
-NODE *searchedNode(NODE *node, int info){	
-	if(info > node->info) {
-		node = searchedNode(node->right, info);
-	} else if(info < node->info) {
-		node = searchedNode(node->left, info);
+NODE *retorna_maior(NODE **no){
+	NODE *aux;
+	aux = *no;
+	if (aux->right==NULL){
+		*no=(*no)->left;
+		return (aux);
+	}else
+		return (retorna_maior(&((*no)->right)));
+}
+
+void exclui(NODE **no, int x){
+    	int alt;
+	NODE *aux;
+	int resultado;
+	        		
+    if ((*no)->info==x){ //Encontrou
+		aux=*no;
+		// Se não tiver filho na esquerda 
+		if ((*no)->left==NULL)
+			*no=(*no)->right; //Então o filho da direita substitui 
+		else 
+		    // Se não tem filho a direita 
+			if ((*no)->right==NULL) 
+			   *no=(*no)->left; // então o filho da esquerda substitui 
+   			else{ // Senão possui dois filhos 
+			   aux=retorna_maior(&((*no)->left)); // Busca o substituto 
+			   (*no)->info=aux->info; 
+		    }
+		free(aux); 
+		return;
+	}else{
+		if (x<(*no)->info)
+		    return (exclui(&((*no)->left),x)); 
+		else
+			return (exclui(&((*no)->right),x));
 	}
-		
-	return node;
+}
+
+void deleteNode(NODE **root){
+	int nodeInfo, matches;
+	
+	printf("Enter The Node Info to Delete: ");
+	scanf(" %d", &nodeInfo);
+	matches = searchMatchesNode(*root, nodeInfo);
+	if(matches == 0) { //if node dont exist
+		printf("There's no match for this info\n");
+		return;
+	}
+	exclui(root, nodeInfo);
 }
 
 void main(){
@@ -256,7 +297,7 @@ void main(){
 					break;
 				}	
 
-				//root = deleteNode(root);
+				deleteNode(&root);
 			break;
 			case '5':
 				if(!root){
